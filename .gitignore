@@ -1,0 +1,16 @@
+# Entorno de Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Datos pesados: guárdalos fuera de Git o descárgalos con un script
+*.zip
+datos-grandes/
+
+# Sistema
+.DS_Store
+Thumbs.db

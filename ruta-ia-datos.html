@@ -1,0 +1,816 @@
+<title>De Mecatrónica a IA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one reading column (max 1080px) laid out like an engineering drawing sheet: a title block (cajetín) on top, then sections in the order you act on them. */
+:root {
+  --paper: #f2f5f6;
+  --sheet: #ffffff;
+  --ink: #13202a;
+  --muted: #56666f;
+  --rule: #d2dbe0;
+  --accent: #0a6a84;
+  --accent-soft: #e1eff3;
+  --alta: #2b7548;
+  --alta-bg: #e2f1e7;
+  --media: #8f5e0c;
+  --media-bg: #f7ecd6;
+  --baja: #85466a;
+  --baja-bg: #f3e5ed;
+  --cursar: #5a6872;
+  --cursar-bg: #e8edf0;
+  --font-display: "Barlow Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0d1519; --sheet: #142026; --ink: #e1e9ee; --muted: #95a5af; --rule: #273741;
+    --accent: #55b8d3; --accent-soft: #14303a;
+    --alta: #72cf99; --alta-bg: #163125; --media: #e5b55c; --media-bg: #37290f;
+    --baja: #d89dbf; --baja-bg: #37202f; --cursar: #a2b0b9; --cursar-bg: #212d35;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0d1519; --sheet: #142026; --ink: #e1e9ee; --muted: #95a5af; --rule: #273741;
+  --accent: #55b8d3; --accent-soft: #14303a;
+  --alta: #72cf99; --alta-bg: #163125; --media: #e5b55c; --media-bg: #37290f;
+  --baja: #d89dbf; --baja-bg: #37202f; --cursar: #a2b0b9; --cursar-bg: #212d35;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.55;
+}
+.wrap {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding-inline: 20px;
+  padding-block: 28px 64px;
+  display: grid;
+  gap: 40px;
+}
+@media (max-width: 480px) { .wrap { padding-inline: 16px; gap: 32px; } }
+
+h1, h2, h3 { font-family: var(--font-display); font-weight: 600; letter-spacing: 0.01em; text-wrap: balance; margin: 0; line-height: 1.1; }
+h1 { font-size: clamp(2.4rem, 6vw, 3.6rem); font-weight: 700; }
+h2 { font-size: 1.85rem; }
+h3 { font-size: 1.25rem; }
+p { margin: 0; }
+a { color: var(--accent); text-underline-offset: 2px; }
+a:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+.lede { color: var(--muted); max-width: 68ch; }
+section { display: grid; gap: 18px; min-width: 0; }
+.sec-head { display: grid; gap: 6px; }
+
+/* Title block */
+.titleblock {
+  background: var(--sheet);
+  border: 1.5px solid var(--ink);
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+}
+.tb-main { grid-row: span 2; padding: 22px 22px 20px; border-right: 1px solid var(--ink); display: grid; gap: 10px; align-content: start; }
+.tb-cell { padding: 12px 16px; border-bottom: 1px solid var(--ink); display: grid; gap: 2px; align-content: start; min-width: 0; }
+.tb-cell:nth-child(2), .tb-cell:nth-child(4) { border-right: 1px solid var(--ink); }
+.tb-cell.last { border-bottom: 0; }
+.tb-value { font-size: 0.95rem; font-weight: 500; }
+.tb-sub { color: var(--muted); font-size: 0.82rem; }
+@media (max-width: 760px) {
+  .titleblock { grid-template-columns: 1fr 1fr; }
+  .tb-main { grid-column: 1 / -1; grid-row: auto; border-right: 0; border-bottom: 1px solid var(--ink); }
+  .tb-cell:nth-child(2), .tb-cell:nth-child(4) { border-right: 1px solid var(--ink); }
+  .tb-cell:nth-child(3), .tb-cell:nth-child(5) { border-right: 0; }
+}
+
+/* Figures */
+.figures { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 760px) { .figures { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.fig { background: var(--sheet); border: 1px solid var(--rule); padding: 14px 16px; display: grid; gap: 4px; align-content: start; }
+.fig-num { font-family: var(--font-display); font-size: 2.3rem; font-weight: 600; line-height: 1; font-variant-numeric: tabular-nums; }
+.fig-txt { font-size: 0.85rem; color: var(--muted); }
+
+/* Callouts */
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width: 760px) { .two { grid-template-columns: 1fr; } }
+.note { background: var(--sheet); border: 1px solid var(--rule); padding: 16px 18px; display: grid; gap: 8px; align-content: start; min-width: 0; }
+.note ul { margin: 0; padding-left: 1.1em; display: grid; gap: 4px; }
+.note.key { border-color: var(--accent); background: var(--accent-soft); }
+
+/* Checklists */
+.check { display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: start; padding: 8px 0; border-top: 1px solid var(--rule); }
+.check:first-child { border-top: 0; }
+.check input { width: 18px; height: 18px; margin: 2px 0 0; accent-color: var(--accent); cursor: pointer; }
+.check label { cursor: pointer; }
+.check input:checked + label { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--rule); }
+.check small { display: block; color: var(--muted); font-size: 0.82rem; text-decoration: none; }
+.checklist { background: var(--sheet); border: 1px solid var(--rule); padding: 6px 18px; }
+
+.progress { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.meter { flex: 1 1 220px; height: 8px; background: var(--cursar-bg); position: relative; overflow: hidden; }
+.meter > i { position: absolute; inset: 0 auto 0 0; background: var(--accent); width: 0; transition: width .3s ease; }
+.save-state { font-size: 0.78rem; color: var(--muted); }
+@media (prefers-reduced-motion: reduce) { .meter > i { transition: none; } }
+
+/* Credit bar */
+.creditbar { display: flex; height: 34px; border: 1px solid var(--ink); background: var(--sheet); }
+.creditbar > div { display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 0.78rem; font-weight: 500; min-width: 0; overflow: hidden; white-space: nowrap; }
+.creditbar > div + div { border-left: 1px solid var(--ink); }
+.c-alta { background: var(--alta-bg); color: var(--alta); }
+.c-media { background: var(--media-bg); color: var(--media); }
+.c-baja { background: var(--baja-bg); color: var(--baja); }
+.c-cursar { background: var(--cursar-bg); color: var(--cursar); }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 0.85rem; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 12px; height: 12px; display: inline-block; border: 1px solid var(--rule); }
+
+/* Filters */
+.filters { display: flex; flex-wrap: wrap; gap: 8px; }
+.filters button {
+  font: inherit; font-size: 0.85rem; padding: 5px 12px; cursor: pointer;
+  background: var(--sheet); color: var(--ink); border: 1px solid var(--rule); border-radius: 999px;
+}
+.filters button[aria-pressed="true"] { background: var(--ink); color: var(--sheet); border-color: var(--ink); }
+
+/* Table */
+.table-wrap { overflow-x: auto; background: var(--sheet); border: 1px solid var(--rule); }
+table { border-collapse: collapse; width: 100%; min-width: 820px; font-size: 0.88rem; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { font-family: var(--font-mono); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 500; background: var(--paper); position: sticky; top: 0; }
+td.num, th.num { text-align: right; font-family: var(--font-mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+tr.period-start td { border-top: 1.5px solid var(--ink); }
+td.per { font-family: var(--font-mono); color: var(--muted); white-space: nowrap; }
+td .none { color: var(--muted); }
+td .why { color: var(--muted); font-size: 0.82rem; }
+.chip { display: inline-block; font-family: var(--font-mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; padding: 2px 8px; border-radius: 999px; white-space: nowrap; font-weight: 500; }
+.chip.alta { background: var(--alta-bg); color: var(--alta); }
+.chip.media { background: var(--media-bg); color: var(--media); }
+.chip.baja { background: var(--baja-bg); color: var(--baja); }
+.chip.cursar { background: var(--cursar-bg); color: var(--cursar); }
+
+/* Semester route */
+.route { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+.sem { background: var(--sheet); border: 1px solid var(--rule); padding: 14px 14px 12px; display: grid; gap: 8px; align-content: start; min-width: 0; }
+.sem-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; border-bottom: 1px solid var(--rule); padding-bottom: 6px; }
+.sem ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 5px; font-size: 0.85rem; }
+.sem li { display: flex; justify-content: space-between; gap: 8px; }
+.sem li span:last-child { font-family: var(--font-mono); color: var(--muted); }
+
+/* Weekly plan */
+.blocks { display: grid; gap: 22px; }
+.block { display: grid; gap: 10px; }
+.block-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; }
+.block-head p { color: var(--muted); font-size: 0.88rem; }
+.week { background: var(--sheet); border: 1px solid var(--rule); display: grid; grid-template-columns: 150px minmax(0, 1fr); }
+.week + .week { margin-top: -1px; }
+.week-when { padding: 12px 14px; border-right: 1px solid var(--rule); display: grid; gap: 2px; align-content: start; }
+.week-when b { font-family: var(--font-display); font-size: 1.25rem; font-weight: 600; }
+.week-body { padding: 10px 16px; display: grid; gap: 2px; min-width: 0; }
+.week-body h3 { font-size: 1.1rem; margin-bottom: 2px; }
+.week.rest .week-body { color: var(--muted); }
+.deliv { margin-top: 4px; font-size: 0.82rem; color: var(--accent); }
+@media (max-width: 600px) {
+  .week { grid-template-columns: 1fr; }
+  .week-when { border-right: 0; border-bottom: 1px solid var(--rule); grid-auto-flow: column; justify-content: start; gap: 12px; align-items: baseline; }
+}
+
+/* Phases */
+.phases { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 860px) { .phases { grid-template-columns: 1fr; } }
+.phase { background: var(--sheet); border: 1px solid var(--rule); padding: 16px; display: grid; gap: 8px; align-content: start; }
+.phase ul { margin: 0; padding-left: 1.1em; display: grid; gap: 4px; font-size: 0.9rem; }
+.phase .goal { font-size: 0.85rem; border-top: 1px solid var(--rule); padding-top: 8px; }
+
+/* Resources */
+.res { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.res .note ul { font-size: 0.9rem; }
+
+footer { color: var(--muted); font-size: 0.82rem; display: grid; gap: 6px; border-top: 1px solid var(--rule); padding-top: 16px; }
+footer ul { margin: 0; padding-left: 1.1em; display: grid; gap: 4px; }
+</style>
+
+<div class="wrap">
+
+  <header class="titleblock">
+    <div class="tb-main">
+      <span class="label">Plan de estudio personal</span>
+      <h1>De Mecatrónica a IA</h1>
+      <p class="lede">Homologación estimada de tus materias de la UNAL en Ingeniería en Inteligencia Artificial y Ciencia de Datos de la UNAD, y lo que vas a estudiar desde hoy hasta que empiecen clases, pensando en cambiar de trabajo.</p>
+    </div>
+    <div class="tb-cell">
+      <span class="label">Origen</span>
+      <span class="tb-value">UNAL Sede La Paz · Ing. Mecatrónica</span>
+      <span class="tb-sub">93 créditos cursados, 90 aprobados · promedio 3.5</span>
+    </div>
+    <div class="tb-cell">
+      <span class="label">Destino</span>
+      <span class="tb-value">UNAD · Ing. en IA y Ciencia de Datos</span>
+      <span class="tb-sub">150 créditos · 9 periodos · Res. 005287 de 2026</span>
+    </div>
+    <div class="tb-cell last">
+      <span class="label">Inicio estimado</span>
+      <span class="tb-value">Periodo 16-01 de 2027</span>
+      <span class="tb-sub">≈ primera semana de febrero</span>
+    </div>
+    <div class="tb-cell last">
+      <span class="label">Fecha · Revisión</span>
+      <span class="tb-value mono">14-10-2026 · Rev. A</span>
+      <span class="tb-sub">Estimación propia, no oficial</span>
+    </div>
+  </header>
+
+  <div class="figures" aria-label="Cifras clave">
+    <div class="fig"><span class="fig-num" id="f-alta">39</span><span class="fig-txt">créditos con homologación de probabilidad alta</span></div>
+    <div class="fig"><span class="fig-num" id="f-max">65</span><span class="fig-txt">créditos si también aceptan las de probabilidad media</span></div>
+    <div class="fig"><span class="fig-num">5–7</span><span class="fig-txt">semestres UNAD que te quedarían, según cuánto homologuen</span></div>
+    <div class="fig"><span class="fig-num">16</span><span class="fig-txt">semanas de preparación entre hoy y el inicio de clases</span></div>
+  </div>
+
+  <section id="tramites">
+    <div class="sec-head">
+      <span class="label">Esta semana</span>
+      <h2>Trámites que no pueden esperar</h2>
+      <p class="lede">La homologación se estudia comparando los contenidos de cada materia. Sin los programas de la UNAL no hay estudio, y en la UNAL ese papel puede tardar semanas.</p>
+    </div>
+    <div class="checklist" id="tramites-list"></div>
+  </section>
+
+  <section id="homologacion">
+    <div class="sec-head">
+      <span class="label">Cruce materia por materia</span>
+      <h2>Homologación estimada</h2>
+      <p class="lede">Cada curso de la UNAD frente a la materia de la UNAL que mejor lo cubre. "Alta" significa que el contenido y los créditos coinciden; "Media", que coincide en parte o con menos créditos; "Baja", que vale la pena pedirla aunque probablemente no pase. La decisión final es de la UNAD.</p>
+    </div>
+    <div class="creditbar" id="creditbar" role="img" aria-label="Distribución de los 150 créditos del plan UNAD"></div>
+    <div class="legend" id="legend"></div>
+    <div class="filters" role="group" aria-label="Filtrar cursos">
+      <button type="button" id="flt-all" data-f="all" aria-pressed="true">Todos</button>
+      <button type="button" id="flt-alta" data-f="alta" aria-pressed="false">Alta</button>
+      <button type="button" id="flt-media" data-f="media" aria-pressed="false">Media</button>
+      <button type="button" id="flt-baja" data-f="baja" aria-pressed="false">Baja</button>
+      <button type="button" id="flt-cursar" data-f="cursar" aria-pressed="false">Por cursar</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Per.</th><th>Curso UNAD</th><th class="num">Cr.</th><th>Materia UNAL</th><th class="num">Nota</th><th>Probabilidad</th><th>Comentario</th></tr></thead>
+        <tbody id="hom-body"></tbody>
+      </table>
+    </div>
+    <div class="two">
+      <div class="note">
+        <h3>Materias UNAL que sobran</h3>
+        <p>Cálculo en varias variables (4 cr, 3.0), Ecuaciones Diferenciales (4 cr, 3.2), Principios de Estática (3 cr, 3.5), Ciencia de los materiales (2 cr, 3.6) y Razonamiento numérico y variacional (2 cr, 3.5) no tienen un curso equivalente claro. Ofrécelas igual para Optimización y Métodos Computacionales o para un electivo disciplinar común: no pierdes nada con pedirlo.</p>
+        <p class="tb-sub">Resistencia de Materiales (0.1) no cuenta y no la necesitas.</p>
+      </div>
+      <div class="note">
+        <h3>Ojo con las notas en 3.0</h3>
+        <p>Cálculo diferencial, Álgebra Lineal y Electrónica I quedaron en 3.0, el mínimo aprobatorio. No encontré que la UNAD exija una nota mínima mayor para homologar, pero pregúntalo por escrito. Aunque las homologuen, álgebra lineal y cálculo son la base de todo machine learning: por eso el bloque 3 de la preparación las repasa.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="ruta">
+    <div class="sec-head">
+      <span class="label">Escenario: homologan las de probabilidad alta y media</span>
+      <h2>Lo que cursarías en la UNAD</h2>
+      <p class="lede">85 créditos repartidos en cinco semestres, respetando el orden del plan oficial. Los prerrequisitos exactos no están en el documento que tengo, así que confírmalos con tu consejero antes de matricular. Si solo homologan las de probabilidad alta, súmale uno o dos semestres.</p>
+    </div>
+    <div class="route" id="route"></div>
+    <div class="two">
+      <div class="note key">
+        <h3>Electivas que te recomiendo</h3>
+        <ul>
+          <li><b>Disciplinar específico:</b> línea Modelado y Análisis Temporal (series de tiempo, ensambles, optimización de modelos). Es la más cercana a sensores, mantenimiento predictivo y pronóstico de demanda, donde tu perfil de mecatrónica pesa.</li>
+          <li><b>Alternativa:</b> IA Creativa, Responsable y Autónoma, si te atrae más IA generativa o reinforcement learning aplicado a robótica.</li>
+          <li><b>Disciplinar común:</b> IoT o Robótica (una puede salir con Electrónica I) y Information security.</li>
+        </ul>
+      </div>
+      <div class="note">
+        <h3>Para acortar la carrera</h3>
+        <ul>
+          <li>La UNAD tiene periodos intersemestrales de 8 semanas: úsalos para electivas.</li>
+          <li>Si para 2029 ya trabajas en datos, pregunta si tu empleo puede validarse como Práctica Profesional.</li>
+          <li>Lo que estudies por tu cuenta (SQL, ML, nube) te deja esos cursos UNAD mucho más livianos.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="preparacion">
+    <div class="sec-head">
+      <span class="label">14 oct 2026 → feb 2027 · unas 10 horas por semana</span>
+      <h2>Preparación antes de la UNAD</h2>
+      <p class="lede">El orden apunta a dos cosas a la vez: llegar adelantado a los cursos que la UNAD no te va a homologar (Bases de Datos, Matemáticas Discretas, Aprendizaje Automático) y tener tres proyectos para mostrar en entrevistas en febrero. Si un tema ya lo dominas, salta a la siguiente semana.</p>
+    </div>
+    <div class="progress">
+      <div class="meter" aria-hidden="true"><i id="meter-fill"></i></div>
+      <span class="mono" id="progress-txt">0 de 0 tareas</span>
+      <span class="save-state" id="save-state">Cargando tu avance…</span>
+    </div>
+    <div class="blocks" id="blocks"></div>
+  </section>
+
+  <section id="despues">
+    <div class="sec-head">
+      <span class="label">Mientras cursas la UNAD</span>
+      <h2>Ruta para cambiar de trabajo</h2>
+      <p class="lede">El título llega en 2029, pero el primer trabajo en datos puede llegar mucho antes. La puerta de entrada más rápida suele ser analista de datos o BI; desde ahí se sube a ciencia de datos o ingeniería de ML.</p>
+    </div>
+    <div class="phases">
+      <div class="phase">
+        <span class="label">Feb – jun 2027</span>
+        <h3>Primer empleo en datos</h3>
+        <ul>
+          <li>Power BI a nivel de certificación (ruta PL-300 de Microsoft Learn).</li>
+          <li>Deep learning práctico con PyTorch: fast.ai, parte 1.</li>
+          <li>Proyecto 4: detección de defectos en piezas con visión por computador, tu mejor nota.</li>
+          <li>Cinco postulaciones por semana a analista de datos o BI junior.</li>
+        </ul>
+        <p class="goal"><b>Meta:</b> una oferta firmada como analista de datos.</p>
+      </div>
+      <div class="phase">
+        <span class="label">Jul – dic 2027</span>
+        <h3>De analista a ML</h3>
+        <ul>
+          <li>Docker y FastAPI para servir modelos.</li>
+          <li>MLOps Zoomcamp de DataTalksClub (gratis).</li>
+          <li>Fundamentos de una nube (AWS, Azure o GCP); te adelanta Cloud Computing.</li>
+          <li>Proyecto 5: un modelo en producción con monitoreo.</li>
+        </ul>
+        <p class="goal"><b>Meta:</b> usar ML en tu trabajo, no solo en el portafolio.</p>
+      </div>
+      <div class="phase">
+        <span class="label">2028 en adelante</span>
+        <h3>Especialización</h3>
+        <ul>
+          <li>Electivas de Modelado y Análisis Temporal.</li>
+          <li>Kaggle con datos de series de tiempo o visión.</li>
+          <li>Proyecto de grado sobre IA industrial: mantenimiento predictivo o control de calidad.</li>
+        </ul>
+        <p class="goal"><b>Meta:</b> científico de datos o ingeniero de ML en industria.</p>
+      </div>
+    </div>
+    <div class="two">
+      <div class="note key">
+        <h3>Cuándo renunciar</h3>
+        <p>Cuando tengas una oferta firmada en datos, no antes. Mientras tanto, busca un problema de datos en tu trabajo actual: automatizar un reporte, analizar tiempos, limpiar una base. Eso entra en tu hoja de vida como experiencia real y es lo que más pesa en una entrevista junior.</p>
+      </div>
+      <div class="note">
+        <h3>Tu ventaja frente a otros juniors</h3>
+        <p>Visión por computador (5.0), Programación Avanzada (5.0) y Diseño de Experimentos (4.2), más la formación en mecatrónica. Véndete como alguien que entiende máquinas, sensores y procesos además de modelos. En IA industrial ese perfil escasea.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="recursos">
+    <div class="sec-head">
+      <span class="label">Casi todo gratis</span>
+      <h2>Recursos por bloque</h2>
+    </div>
+    <div class="res">
+      <div class="note">
+        <h3>Python y datos</h3>
+        <ul>
+          <li><a href="https://www.kaggle.com/learn" target="_blank" rel="noopener">Kaggle Learn</a>: Python, Pandas, Data Visualization</li>
+          <li><a href="https://wesmckinney.com/book/" target="_blank" rel="noopener">Python for Data Analysis, 3.ª ed.</a> (libro abierto)</li>
+          <li><a href="https://www.datos.gov.co/" target="_blank" rel="noopener">datos.gov.co</a> para datasets colombianos</li>
+        </ul>
+      </div>
+      <div class="note">
+        <h3>SQL</h3>
+        <ul>
+          <li><a href="https://sqlbolt.com/" target="_blank" rel="noopener">SQLBolt</a> para lo básico</li>
+          <li><a href="https://selectstarsql.com/" target="_blank" rel="noopener">Select Star SQL</a> para consultas reales</li>
+          <li><a href="https://leetcode.com/studyplan/top-sql-50/" target="_blank" rel="noopener">LeetCode SQL 50</a> para práctica de entrevistas</li>
+        </ul>
+      </div>
+      <div class="note">
+        <h3>Matemáticas para ML</h3>
+        <ul>
+          <li><a href="https://www.3blue1brown.com/topics/linear-algebra" target="_blank" rel="noopener">3Blue1Brown: álgebra lineal</a> y <a href="https://www.3blue1brown.com/topics/calculus" target="_blank" rel="noopener">cálculo</a></li>
+          <li><a href="https://mml-book.github.io/" target="_blank" rel="noopener">Mathematics for Machine Learning</a> (libro abierto)</li>
+          <li><a href="https://www.youtube.com/@statquest" target="_blank" rel="noopener">StatQuest</a> para estadística</li>
+        </ul>
+      </div>
+      <div class="note">
+        <h3>Machine learning</h3>
+        <ul>
+          <li><a href="https://www.coursera.org/specializations/machine-learning-introduction" target="_blank" rel="noopener">Machine Learning Specialization</a> (Andrew Ng; se puede auditar)</li>
+          <li>Géron, Hands-On Machine Learning (<a href="https://github.com/ageron/handson-ml3" target="_blank" rel="noopener">notebooks</a>)</li>
+          <li><a href="https://archive.ics.uci.edu/dataset/601/ai4i+2020+predictive+maintenance+dataset" target="_blank" rel="noopener">AI4I 2020</a>, dataset de mantenimiento predictivo</li>
+        </ul>
+      </div>
+      <div class="note">
+        <h3>Deep learning</h3>
+        <ul>
+          <li><a href="https://course.fast.ai/" target="_blank" rel="noopener">fast.ai: Practical Deep Learning</a></li>
+          <li><a href="https://d2l.ai/" target="_blank" rel="noopener">Dive into Deep Learning</a> (libro abierto)</li>
+          <li><a href="https://karpathy.ai/zero-to-hero.html" target="_blank" rel="noopener">Karpathy: Neural Networks Zero to Hero</a></li>
+        </ul>
+      </div>
+      <div class="note">
+        <h3>Empleabilidad y producción</h3>
+        <ul>
+          <li><a href="https://learn.microsoft.com/en-us/credentials/certifications/data-analyst-associate/" target="_blank" rel="noopener">Microsoft PL-300 (Power BI)</a></li>
+          <li><a href="https://github.com/DataTalksClub/mlops-zoomcamp" target="_blank" rel="noopener">MLOps Zoomcamp</a> y <a href="https://github.com/DataTalksClub/data-engineering-zoomcamp" target="_blank" rel="noopener">Data Engineering Zoomcamp</a></li>
+          <li><a href="https://streamlit.io/cloud" target="_blank" rel="noopener">Streamlit Community Cloud</a> para publicar demos</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span class="label">Supuestos y fuentes</span>
+    <ul>
+      <li>Plan de estudios UNAD: documento oficial del programa, registro calificado Res. 005287 del 24 de febrero de 2026.</li>
+      <li>Materias y notas: certificado de la UNAL Sede La Paz expedido el 4 de noviembre de 2025.</li>
+      <li>Fechas: Acuerdo 026 de 2025 del Consejo Académico de la UNAD. El periodo 16-01 de 2026 empezó el 4 de febrero y la matrícula fue del 30 de septiembre al 20 de enero; las fechas de 2027 aún no están en ese acuerdo.</li>
+      <li>Criterio de homologación UNAD: comparación de contenidos, créditos, tipología y propósitos con los programas de los cursos aprobados (Estatuto Académico, Acuerdo 029 de 2020, art. 84). La nota mínima y el tope de créditos homologables no los pude confirmar.</li>
+      <li>La ruta por semestres no verifica prerrequisitos. Las horas por semana son un supuesto para alguien que trabaja tiempo completo.</li>
+    </ul>
+  </footer>
+</div>
+
+<script>
+(function () {
+  // [periodo, curso UNAD, créditos, materia UNAL, nota, probabilidad, comentario]
+  var HOM = [
+    [1, "Introducción a la Ingeniería", 2, "Tecnologías básicas de mecatrónica (2)", "3.6", "media", "Ambas son introductorias; depende del contenido."],
+    [1, "Fundamentos de Programación", 3, "Fundamentos de Programación de Computadores (3)", "3.2", "alta", ""],
+    [1, "Cátedra Unadista", 3, null, "", "cursar", "Curso institucional de la UNAD."],
+    [1, "Pensamiento Lógico y Matemático", 3, "Pensamiento Matemático (3)", "3.9", "alta", "Respaldo: Razonamiento numérico y variacional."],
+    [1, "Herramientas Digitales para la Gestión del Conocimiento", 3, null, "", "cursar", "Lo más cercano es Lenguajes Visuales y Narrativos (2 cr)."],
+    [1, "Inglés A1", 3, "Inglés I (3)", "4.2", "alta", "Confirma si homologan inglés o piden prueba de clasificación."],
+    [2, "Cálculo Diferencial", 3, "Cálculo diferencial (4)", "3.0", "alta", "Nota en el mínimo: repásalo igual."],
+    [2, "Programación", 3, "Programación Avanzada (3)", "5.0", "alta", ""],
+    [2, "Matemáticas Discretas", 3, null, "", "cursar", "No la viste en la UNAL."],
+    [2, "Fundamentos en Gestión Integral", 3, "Gerencia y gestión de proyectos (3)", "3.5", "media", "Coincide en gestión; el enfoque puede variar."],
+    [2, "Competencias comunicativas", 3, "Lenguaje y comunicación (3)", "4.8", "alta", ""],
+    [2, "Inglés A2", 3, "Inglés II (3)", "4.2", "alta", ""],
+    [3, "Cálculo Integral", 3, "Cálculo Integral (4)", "3.5", "alta", ""],
+    [3, "Álgebra Lineal", 3, "Álgebra Lineal (4)", "3.0", "alta", "Base de todo ML: repásala aunque la homologuen."],
+    [3, "Estadística y Probabilidad", 3, "Probabilidad y estadística fundamental (3)", "3.4", "alta", ""],
+    [3, "Fundamentos y Generalidades de Investigación", 3, "Fundamentos de las Ciencias Experimentales (2)", "3.5", "baja", "Menos créditos. Pídela de todas formas."],
+    [3, "Estructura de Datos", 3, "Estructuras de Datos (3)", "3.3", "alta", ""],
+    [3, "Ética y Ciudadanía", 3, "Fundamentos de Ética (2) + Universidad y Sociedad (2)", "4.1 / 4.8", "media", "Pide que sumen las dos para cubrir los 3 créditos."],
+    [3, "Prestación del Servicio Social Unadista", 0, null, "", "cursar", "Requisito institucional, 0 créditos."],
+    [4, "Física General", 3, "Fundamentos de mecánica (4)", "3.1", "alta", ""],
+    [4, "Optimización y Métodos Computacionales", 3, null, "", "cursar", "Ecuaciones Diferenciales ayuda, pero no cubre optimización numérica."],
+    [4, "Estadística Inferencial", 3, "Diseño de Experimentos (4)", "4.2", "media", "Cubre ANOVA y pruebas de hipótesis."],
+    [4, "Proyecto de Ingeniería I", 3, null, "", "cursar", "Proyecto propio del programa."],
+    [4, "Bases de Datos", 3, null, "", "cursar", "La adelantas en el bloque 2."],
+    [4, "Inglés B1", 3, "Inglés III (3)", "AP", "media", "Aprobada sin nota numérica."],
+    [5, "Aprendizaje Automático", 4, null, "", "cursar", "La adelantas en el bloque 4."],
+    [5, "Procesamiento de Lenguaje Natural", 3, null, "", "cursar", ""],
+    [5, "Gobernanza, Seguridad y Ética en IA y CD", 2, null, "", "cursar", ""],
+    [5, "NoSQL databases", 3, null, "", "cursar", ""],
+    [5, "Extracción, transformación y carga (ETL)", 3, null, "", "cursar", ""],
+    [5, "Inglés B1+", 3, "Inglés IV (3)", "AP", "media", "Aprobada sin nota numérica."],
+    [6, "Aprendizaje Profundo", 3, null, "", "cursar", ""],
+    [6, "Cloud Computing", 3, null, "", "cursar", ""],
+    [6, "Minería de Datos", 3, null, "", "cursar", ""],
+    [6, "Proyecto de Ingeniería II", 3, null, "", "cursar", ""],
+    [6, "Electivo Disciplinar Común I", 3, "Electrónica I (3)", "3.0", "media", "Afín a las electivas IoT o Robótica."],
+    [6, "Electivo Disciplinar Específico I", 3, null, "", "cursar", ""],
+    [7, "Visión Computacional", 3, "Visión por computador (3)", "5.0", "alta", "Tu mejor carta."],
+    [7, "Software Engineering for ML Operations", 2, null, "", "cursar", ""],
+    [7, "Big Data", 3, null, "", "cursar", ""],
+    [7, "Electivo Disciplinar Común II", 3, null, "", "cursar", ""],
+    [7, "Electivo Disciplinar Específico II", 3, null, "", "cursar", ""],
+    [7, "Electivo IBC (Social Solidario)", 3, "Fundamentos de las Ciencias Sociales (3)", "3.9", "media", "Cercana a Inclusión Social o Sujeto, Comunidad e Interacción Social."],
+    [8, "Gestión y despliegue de modelos en la nube con MLOps", 3, null, "", "cursar", ""],
+    [8, "Visualización en Ciencia de Datos", 3, null, "", "cursar", ""],
+    [8, "Electivo Disciplinar Común III", 3, null, "", "cursar", ""],
+    [8, "Electivo Disciplinar Específico III", 3, null, "", "cursar", ""],
+    [8, "Electivo de formación complementaria I", 2, "Dibujo básico (3)", "3.5", "media", "Las electivas de libre elección suelen ser flexibles."],
+    [8, "Electivo IBC (Económico Administrativo)", 3, null, "", "cursar", ""],
+    [9, "Práctica Profesional", 2, null, "", "cursar", "Pregunta si tu trabajo puede validarse."],
+    [9, "Proyecto de Ingeniería III", 3, null, "", "cursar", ""],
+    [9, "Electivo Disciplinar Específico IV", 3, null, "", "cursar", ""],
+    [9, "Electivo de formación complementaria II", 1, "Lenguajes Visuales y Narrativos (2)", "3.1", "media", ""]
+  ];
+
+  var ROUTE = [
+    { name: "2027-I", when: "feb – jun 2027", items: [["Cátedra Unadista", 3], ["Herramientas Digitales", 3], ["Matemáticas Discretas", 3], ["Fund. de Investigación", 3], ["Bases de Datos", 3], ["Optimización y Mét. Comp.", 3], ["Servicio Social", 0]] },
+    { name: "2027-II", when: "ago – dic 2027", items: [["Aprendizaje Automático", 4], ["Procesamiento de Lenguaje Natural", 3], ["ETL", 3], ["NoSQL databases", 3], ["Proyecto de Ingeniería I", 3], ["Gobernanza y Ética en IA", 2]] },
+    { name: "2028-I", when: "feb – jun 2028", items: [["Aprendizaje Profundo", 3], ["Cloud Computing", 3], ["Minería de Datos", 3], ["Big Data", 3], ["Proyecto de Ingeniería II", 3], ["Electivo Específico I", 3]] },
+    { name: "2028-II", when: "ago – dic 2028", items: [["SE for ML Operations", 2], ["MLOps en la nube", 3], ["Visualización en CD", 3], ["Electivo Común II", 3], ["Electivo Común III", 3], ["Electivo Específico II", 3]] },
+    { name: "2029-I", when: "feb – jun 2029", items: [["Electivo Específico III", 3], ["Electivo Específico IV", 3], ["Electivo IBC Económico", 3], ["Proyecto de Ingeniería III", 3], ["Práctica Profesional", 2]] }
+  ];
+
+  var TRAMITES = [
+    ["tr1", "Pedir a la UNAL los contenidos programáticos (programas de asignatura) firmados de todas las materias marcadas Alta, Media y Baja.", "Secretaría de la Sede La Paz. Pide también las que sobran, por si sirven para electivas."],
+    ["tr2", "Inscribirte en la UNAD para el periodo 16-01 de 2027, indicando ingreso con homologación.", "En 2026 la inscripción de este periodo fue del 30 de septiembre al 20 de enero; espera fechas parecidas."],
+    ["tr3", "Radicar la solicitud de estudio de homologación con el certificado de notas y los contenidos programáticos.", "Tiene un costo (derechos pecuniarios). Pide la respuesta antes de matricular cursos."],
+    ["tr4", "Preguntar por escrito la nota mínima para homologar y el tope de créditos homologables.", "Importa por tus materias en 3.0."],
+    ["tr5", "Preguntar cómo tratan el inglés: si homologan Inglés I a IV o si debes presentar prueba de clasificación.", "Son 12 créditos en juego."],
+    ["tr6", "Preguntar si el programa ya tiene tabla de homologación desde Ingeniería Mecatrónica o si lo estudian caso por caso.", "El programa es nuevo (registro de febrero de 2026)."]
+  ];
+
+  var BLOCKS = [
+    { name: "Arranque", note: "Esta semana", weeks: [
+      { n: "S0", d: "14 – 18 oct", h: "3 h", t: "Entorno de trabajo", tasks: [
+        ["w0a", "Instalar Python 3.12 (con Anaconda o uv), VS Code, Jupyter y Git."],
+        ["w0b", "Crear tu cuenta de GitHub y un repositorio para el portafolio."],
+        ["w0c", "Fijar horario: 1,5 h de lunes a jueves y 4 h el sábado."]
+      ]}
+    ]},
+    { name: "Bloque 1 · Python para datos", note: "3 semanas. Programación Avanzada (5.0) te da ventaja: ve rápido.", weeks: [
+      { n: "S1", d: "19 – 25 oct", h: "10 h", t: "Repaso de Python", tasks: [
+        ["w1a", "Kaggle Learn: curso de Python completo."],
+        ["w1b", "20 ejercicios cortos de funciones, diccionarios, comprensiones, clases y archivos."],
+        ["w1c", "Git básico: commit, branch y push de tus ejercicios."]
+      ]},
+      { n: "S2", d: "26 oct – 1 nov", h: "10 h", t: "NumPy y pandas", tasks: [
+        ["w2a", "Kaggle Learn: Pandas."],
+        ["w2b", "Python for Data Analysis, capítulos 4 y 5."],
+        ["w2c", "Cargar un CSV de datos.gov.co y responder 5 preguntas con pandas."]
+      ]},
+      { n: "S3", d: "2 – 8 nov", h: "10 h", t: "Limpieza, agrupación y gráficos", tasks: [
+        ["w3a", "Python for Data Analysis, capítulos 7 a 10."],
+        ["w3b", "Proyecto 1: análisis exploratorio de un dataset colombiano (Saber 11, siniestros viales o precios de energía)."],
+        ["w3c", "Publicar el Proyecto 1 en GitHub con un README que cuente las conclusiones."]
+      ], deliv: "Entregable: Proyecto 1 publicado." }
+    ]},
+    { name: "Bloque 2 · SQL y bases de datos", note: "3 semanas. Adelanta Bases de Datos, que no se homologa.", weeks: [
+      { n: "S4", d: "9 – 15 nov", h: "10 h", t: "SQL básico", tasks: [
+        ["w4a", "SQLBolt completo."],
+        ["w4b", "Instalar PostgreSQL y cargar el dataset del Proyecto 1."]
+      ]},
+      { n: "S5", d: "16 – 22 nov", h: "10 h", t: "SQL intermedio", tasks: [
+        ["w5a", "JOINs, subconsultas, CTEs y funciones de ventana (Select Star SQL)."],
+        ["w5b", "LeetCode SQL 50: los primeros 25 problemas."]
+      ]},
+      { n: "S6", d: "23 – 29 nov", h: "12 h", t: "Modelado y Proyecto 2", tasks: [
+        ["w6a", "Modelo entidad-relación y normalización hasta tercera forma normal."],
+        ["w6b", "Proyecto 2: 10 preguntas de negocio resueltas en SQL y un tablero en Power BI o Looker Studio."],
+        ["w6c", "Terminar LeetCode SQL 50."]
+      ], deliv: "Entregable: Proyecto 2 con tablero." }
+    ]},
+    { name: "Bloque 3 · Matemáticas para ML", note: "3 semanas. Refuerza las materias que pasaste en 3.0.", weeks: [
+      { n: "S7", d: "30 nov – 6 dic", h: "10 h", t: "Álgebra lineal con intuición", tasks: [
+        ["w7a", "3Blue1Brown: Essence of Linear Algebra, todos los videos."],
+        ["w7b", "En NumPy: producto punto, proyecciones, inversa, valores propios y SVD."],
+        ["w7c", "Comprimir una imagen con SVD (te conecta con visión por computador)."]
+      ]},
+      { n: "S8", d: "7 – 13 dic", h: "10 h", t: "Cálculo para ML", tasks: [
+        ["w8a", "Gradiente, derivadas parciales y regla de la cadena (Mathematics for ML, cap. 5)."],
+        ["w8b", "Implementar descenso de gradiente desde cero para regresión lineal en NumPy."]
+      ]},
+      { n: "S9", d: "14 – 20 dic", h: "10 h", t: "Probabilidad e inferencia", tasks: [
+        ["w9a", "StatQuest: distribuciones, teorema del límite central, valor p e intervalos de confianza."],
+        ["w9b", "Mini-proyecto: prueba A/B con datos simulados y una conclusión escrita."]
+      ]}
+    ]},
+    { name: "Bloque 4 · Machine learning clásico", note: "5 semanas más el receso. Adelanta Aprendizaje Automático.", weeks: [
+      { n: "S10", d: "21 – 27 dic", h: "8 h", t: "Primeros modelos", tasks: [
+        ["w10a", "Machine Learning Specialization, curso 1: regresión y clasificación."]
+      ]},
+      { n: "—", d: "28 dic – 3 ene", h: "0 h", t: "Receso", rest: true, tasks: [], text: "Coincide con el receso de la UNAD. Descansa, o ponte al día si vas atrasado." },
+      { n: "S11", d: "4 – 10 ene", h: "10 h", t: "scikit-learn", tasks: [
+        ["w11a", "Hands-On Machine Learning, capítulos 2 y 3."],
+        ["w11b", "Pipelines, validación cruzada y métricas: precision, recall, F1 y ROC."]
+      ]},
+      { n: "S12", d: "11 – 17 ene", h: "10 h", t: "Árboles y Kaggle", tasks: [
+        ["w12a", "Random Forest y Gradient Boosting (XGBoost o LightGBM)."],
+        ["w12b", "Kaggle Learn: Intermediate Machine Learning."],
+        ["w12c", "Primera entrega en Kaggle: Titanic o House Prices."]
+      ]},
+      { n: "S13", d: "18 – 24 ene", h: "12 h", t: "Proyecto 3: mantenimiento predictivo", tasks: [
+        ["w13a", "Elegir dataset: AI4I 2020 (UCI) o NASA C-MAPSS."],
+        ["w13b", "Modelo que predice fallas, con análisis de errores e importancia de variables."]
+      ]},
+      { n: "S14", d: "25 – 31 ene", h: "12 h", t: "Despliegue y hoja de vida", tasks: [
+        ["w14a", "App en Streamlit del Proyecto 3, publicada en Streamlit Community Cloud."],
+        ["w14b", "Actualizar CV y LinkedIn con los tres proyectos y un titular de ingeniero orientado a datos."]
+      ], deliv: "Entregable: portafolio de 3 proyectos listo para postular." }
+    ]},
+    { name: "Inicio UNAD", note: "Fecha exacta por confirmar.", weeks: [
+      { n: "S15", d: "1 – 7 feb", h: "—", t: "Primer semestre", tasks: [
+        ["w15a", "Organizar el semestre: aula virtual, agenda de actividades y horas fijas junto al trabajo."],
+        ["w15b", "Empezar a postular: cinco vacantes de analista de datos junior por semana."]
+      ]}
+    ]}
+  ];
+
+  var LABEL = { alta: "Alta", media: "Media", baja: "Baja", cursar: "Por cursar" };
+
+  function el(tag, attrs, text) {
+    var e = document.createElement(tag);
+    if (attrs) for (var k in attrs) { if (k === "class") e.className = attrs[k]; else e.setAttribute(k, attrs[k]); }
+    if (text != null) e.textContent = text;
+    return e;
+  }
+
+  // Credit totals
+  var totals = { alta: 0, media: 0, baja: 0, cursar: 0 };
+  HOM.forEach(function (r) { totals[r[5]] += r[2]; });
+  var total = totals.alta + totals.media + totals.baja + totals.cursar;
+  document.getElementById("f-alta").textContent = totals.alta;
+  document.getElementById("f-max").textContent = totals.alta + totals.media;
+
+  var bar = document.getElementById("creditbar");
+  var legend = document.getElementById("legend");
+  ["alta", "media", "baja", "cursar"].forEach(function (k) {
+    var seg = el("div", { "class": "c-" + k, title: LABEL[k] + ": " + totals[k] + " créditos" }, totals[k] >= 6 ? String(totals[k]) : "");
+    seg.style.flex = totals[k] + " 0 0";
+    bar.appendChild(seg);
+    var item = el("span");
+    item.appendChild(el("i", { "class": "c-" + k }));
+    item.appendChild(document.createTextNode(LABEL[k] + " · " + totals[k] + " cr"));
+    legend.appendChild(item);
+  });
+  legend.appendChild(el("span", { "class": "mono" }, "Total plan: " + total + " cr"));
+
+  // Homologation table
+  var tbody = document.getElementById("hom-body");
+  var lastPer = null;
+  HOM.forEach(function (r) {
+    var tr = el("tr", { "data-prob": r[5] });
+    if (r[0] !== lastPer) { tr.className = "period-start"; lastPer = r[0]; }
+    tr.appendChild(el("td", { "class": "per" }, "P" + r[0]));
+    tr.appendChild(el("td", null, r[1]));
+    tr.appendChild(el("td", { "class": "num" }, String(r[2])));
+    var unal = el("td");
+    if (r[3]) unal.textContent = r[3]; else unal.appendChild(el("span", { "class": "none" }, "—"));
+    tr.appendChild(unal);
+    tr.appendChild(el("td", { "class": "num" }, r[4] || ""));
+    var pc = el("td"); pc.appendChild(el("span", { "class": "chip " + r[5] }, LABEL[r[5]]));
+    tr.appendChild(pc);
+    var why = el("td"); why.appendChild(el("span", { "class": "why" }, r[6]));
+    tr.appendChild(why);
+    tbody.appendChild(tr);
+  });
+
+  var filterBtns = document.querySelectorAll(".filters button");
+  function applyFilter(f) {
+    filterBtns.forEach(function (b) { b.setAttribute("aria-pressed", b.getAttribute("data-f") === f ? "true" : "false"); });
+    var prev = null;
+    tbody.querySelectorAll("tr").forEach(function (tr) {
+      var show = f === "all" || tr.getAttribute("data-prob") === f;
+      tr.hidden = !show;
+    });
+    // Re-mark period boundaries among visible rows
+    tbody.querySelectorAll("tr").forEach(function (tr) {
+      if (tr.hidden) return;
+      var per = tr.firstChild.textContent;
+      tr.classList.toggle("period-start", per !== prev);
+      prev = per;
+    });
+    try { localStorage.setItem("ruta-ia-filter", f); } catch (e) {}
+  }
+  filterBtns.forEach(function (b) { b.addEventListener("click", function () { applyFilter(b.getAttribute("data-f")); }); });
+  try { var savedF = localStorage.getItem("ruta-ia-filter"); if (savedF) applyFilter(savedF); } catch (e) {}
+
+  // Route
+  var route = document.getElementById("route");
+  ROUTE.forEach(function (s) {
+    var card = el("div", { "class": "sem" });
+    var head = el("div", { "class": "sem-head" });
+    var sum = s.items.reduce(function (a, i) { return a + i[1]; }, 0);
+    var hn = el("div");
+    hn.appendChild(el("h3", null, s.name));
+    hn.appendChild(el("span", { "class": "label" }, s.when));
+    head.appendChild(hn);
+    head.appendChild(el("span", { "class": "mono" }, sum + " cr"));
+    card.appendChild(head);
+    var ul = el("ul");
+    s.items.forEach(function (i) {
+      var li = el("li");
+      li.appendChild(el("span", null, i[0]));
+      li.appendChild(el("span", null, String(i[1])));
+      ul.appendChild(li);
+    });
+    card.appendChild(ul);
+    route.appendChild(card);
+  });
+
+  // Checklists
+  function checkRow(id, text, sub) {
+    var row = el("div", { "class": "check" });
+    var cb = el("input", { type: "checkbox", id: "cb-" + id, "data-task": id });
+    var lb = el("label", { "for": "cb-" + id }, text);
+    if (sub) lb.appendChild(el("small", null, sub));
+    row.appendChild(cb); row.appendChild(lb);
+    return row;
+  }
+  var trList = document.getElementById("tramites-list");
+  TRAMITES.forEach(function (t) { trList.appendChild(checkRow(t[0], t[1], t[2])); });
+
+  var blocksEl = document.getElementById("blocks");
+  BLOCKS.forEach(function (b) {
+    var blk = el("div", { "class": "block" });
+    var bh = el("div", { "class": "block-head" });
+    bh.appendChild(el("h3", null, b.name));
+    bh.appendChild(el("p", null, b.note));
+    blk.appendChild(bh);
+    var list = el("div");
+    b.weeks.forEach(function (w) {
+      var wk = el("div", { "class": "week" + (w.rest ? " rest" : "") });
+      var when = el("div", { "class": "week-when" });
+      when.appendChild(el("b", null, w.n));
+      when.appendChild(el("span", { "class": "label" }, w.d));
+      when.appendChild(el("span", { "class": "label" }, w.h));
+      wk.appendChild(when);
+      var body = el("div", { "class": "week-body" });
+      body.appendChild(el("h3", null, w.t));
+      if (w.text) body.appendChild(el("p", null, w.text));
+      w.tasks.forEach(function (t) { body.appendChild(checkRow(t[0], t[1])); });
+      if (w.deliv) body.appendChild(el("p", { "class": "deliv" }, w.deliv));
+      wk.appendChild(body);
+      list.appendChild(wk);
+    });
+    blk.appendChild(list);
+    blocksEl.appendChild(blk);
+  });
+
+  // Progress state
+  var state = { done: {} };
+  var boxes = Array.prototype.slice.call(document.querySelectorAll("input[data-task]"));
+  var planBoxes = boxes.filter(function (cb) { return cb.getAttribute("data-task").charAt(0) === "w"; });
+
+  function updateProgress() {
+    var n = planBoxes.length, d = 0;
+    planBoxes.forEach(function (cb) { if (cb.checked) d++; });
+    document.getElementById("progress-txt").textContent = d + " de " + n + " tareas";
+    document.getElementById("meter-fill").style.width = (n ? (100 * d / n) : 0) + "%";
+  }
+  function applyChecks() {
+    boxes.forEach(function (cb) { cb.checked = !!state.done[cb.getAttribute("data-task")]; });
+    updateProgress();
+  }
+  function setStatus(s) {
+    var t = { db: "Tu avance se guarda en esta página.", local: "Tu avance se guarda solo en este navegador.", error: "No se pudo guardar el último cambio; vuelve a marcarlo en un momento." }[s];
+    document.getElementById("save-state").textContent = t || "";
+  }
+  function loadLocal() {
+    try { var raw = localStorage.getItem("ruta-ia-progress"); if (raw) state.done = JSON.parse(raw) || {}; } catch (e) {}
+  }
+  function saveLocal() {
+    try { localStorage.setItem("ruta-ia-progress", JSON.stringify(state.done)); } catch (e) {}
+  }
+
+  var ref = null, dirty = false, timer = null, chain = Promise.resolve();
+  function scheduleSave() {
+    dirty = true;
+    saveLocal();
+    clearTimeout(timer);
+    timer = setTimeout(function () {
+      if (!ref) { dirty = false; return; }
+      var body = { done: Object.assign({}, state.done), updatedAt: new Date().toISOString() };
+      chain = chain.then(function () { return ref.set(body); })
+        .then(function () { dirty = false; setStatus("db"); })
+        .catch(function () { dirty = false; setStatus("error"); });
+    }, 700);
+  }
+
+  boxes.forEach(function (cb) {
+    cb.addEventListener("change", function () {
+      var id = cb.getAttribute("data-task");
+      if (cb.checked) state.done[id] = true; else delete state.done[id];
+      updateProgress();
+      scheduleSave();
+    });
+  });
+
+  loadLocal();
+  applyChecks();
+  setStatus("local");
+
+  var use = window.claude && window.claude.use;
+  if (use) {
+    window.claude.use("db").then(function (db) {
+      if (!db) { setStatus("local"); return; }
+      ref = db.doc("progress/main");
+      var first = true;
+      ref.onSnapshot(function (snap) {
+        if (snap.metadata.hasPendingWrites || dirty) return;
+        var data = snap.exists ? snap.data() : null;
+        if (first && !data && Object.keys(state.done).length) {
+          first = false; setStatus("db"); scheduleSave(); return;
+        }
+        first = false;
+        state.done = data && data.done ? Object.assign({}, data.done) : {};
+        saveLocal();
+        applyChecks();
+        setStatus("db");
+      }, function () { ref = null; setStatus("local"); });
+    }).catch(function () { setStatus("local"); });
+  }
+})();
+</script>
