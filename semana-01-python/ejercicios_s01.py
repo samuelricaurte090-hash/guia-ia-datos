@@ -24,10 +24,10 @@ from pathlib import Path
 def celsius_a_fahrenheit(c: float) -> float:
     """Ejercicio 1. Convierte grados Celsius a Fahrenheit.
 
-    >>> celsius_a_fahrenheit(100)
-    212.0
+    >>> celsius_a_fahrenheit(0)
+    32.0
     """
-    raise NotImplementedError("Ejercicio 1: escribe tu solución")
+    return c * 9/5 + 32
 
 
 def promedio(valores: list[float]) -> float:
@@ -38,7 +38,9 @@ def promedio(valores: list[float]) -> float:
     >>> promedio([2, 4, 6])
     4.0
     """
-    raise NotImplementedError("Ejercicio 2: escribe tu solución")
+    if not valores:
+        raise ValueError("La lista de valores está vacía")
+    return sum(valores) / len(valores)
 
 
 def contar_pares(numeros: list[int]) -> int:
@@ -49,7 +51,8 @@ def contar_pares(numeros: list[int]) -> int:
     >>> contar_pares([1, 2, 3, 4, 0])
     3
     """
-    raise NotImplementedError("Ejercicio 3: escribe tu solución")
+    pares = [num for num in numeros if num % 2 == 0]
+    return len(pares)
 
 
 def normalizar_nombre(texto: str) -> str:
@@ -61,7 +64,9 @@ def normalizar_nombre(texto: str) -> str:
     >>> normalizar_nombre("  juan   PÉREZ ")
     'Juan Pérez'
     """
-    raise NotImplementedError("Ejercicio 4: escribe tu solución")
+    palabras = texto.strip().split()
+    palabras_normalizadas = [palabra.capitalize() for palabra in palabras]
+    return " ".join(palabras_normalizadas)
 
 
 def es_palindromo(texto: str) -> bool:
@@ -73,7 +78,8 @@ def es_palindromo(texto: str) -> bool:
     >>> es_palindromo("Anita lava la tina")
     True
     """
-    raise NotImplementedError("Ejercicio 5: escribe tu solución")
+    texto_limpio = ''.join(caracter.lower() for caracter in texto if caracter.isalnum())
+    return texto_limpio == texto_limpio[::-1]
 
 
 # ---------------------------------------------------------------------------
