@@ -8,6 +8,7 @@
 | Martes | | 1,5 h |
 | Miércoles | | 1,5 h |
 | Jueves | | 1,5 h |
+| Viernes | | 1,5 h |
 | Sábado | | 4 h |
 
 ## Bitácora
