@@ -16,6 +16,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from collections import Counter, defaultdict
 
 # ---------------------------------------------------------------------------
 # Nivel 1 · Básicos
@@ -95,7 +96,8 @@ def frecuencias(palabras: list[str]) -> dict[str, int]:
     >>> frecuencias(["Hola", "hola", "mundo"])
     {'hola': 2, 'mundo': 1}
     """
-    raise NotImplementedError("Ejercicio 6: escribe tu solución")
+    frecuencias = Counter(p.lower() for p in palabras)
+    return dict(frecuencias)
 
 
 def top_n(conteos: dict[str, int], n: int) -> list[tuple[str, int]]:
@@ -107,7 +109,8 @@ def top_n(conteos: dict[str, int], n: int) -> list[tuple[str, int]]:
     >>> top_n({"a": 3, "b": 5, "c": 3, "d": 1}, 2)
     [('b', 5), ('a', 3)]
     """
-    raise NotImplementedError("Ejercicio 7: escribe tu solución")
+    ordenado = sorted(conteos.items(), key=lambda par: (-par[1], par[0]))[:n]
+    return ordenado
 
 
 def invertir_diccionario(d: dict[str, str]) -> dict[str, list[str]]:
